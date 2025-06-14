@@ -56,7 +56,7 @@ yaml
 
 ```bash
 # 1. 프로젝트 클론
-git clone https://github.com/your-org/insufit-crm.git
+git clone https://github.com/ParkjunHyukkk/insure-crm-fe.git
 cd insufit-crm
 
 # 2. 환경변수 파일 복사
