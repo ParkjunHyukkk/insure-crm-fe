@@ -29,6 +29,10 @@ import { CustomerDetailModal } from "@/components/customer-detail-modal";
 import { Button } from "@/components/ui/button";
 import { sampleCustomers, todayTasks } from "@/app/data";
 import SigninPage from "../(auth)/signin/page";
+import DashboardTabs from "./_components/DashboardTabs";
+import KPICards from "./_components/KPICards";
+import TodoList from "./_components/TodoList";
+import NotificationList from "./_components/NotificationList";
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -62,34 +66,6 @@ export default function Dashboard() {
     pendingAlerts: todayTasks.length,
   };
 
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case "high":
-        return "destructive";
-      case "medium":
-        return "default";
-      case "low":
-        return "secondary";
-      default:
-        return "default";
-    }
-  };
-
-  const getTaskIcon = (type) => {
-    switch (type) {
-      case "renewal":
-        return <Calendar className="h-4 w-4" />;
-      case "birthday":
-        return <Gift className="h-4 w-4" />;
-      case "care":
-        return <MessageSquare className="h-4 w-4" />;
-      case "followup":
-        return <Phone className="h-4 w-4" />;
-      default:
-        return <Bell className="h-4 w-4" />;
-    }
-  };
-
   const handleLogin = (username: string) => {
     setIsAuthenticated(true);
     setCurrentUser(username);
@@ -114,160 +90,19 @@ export default function Dashboard() {
               onValueChange={setActiveTab}
               className="w-full"
             >
-              <TabsList className="grid w-full grid-cols-3 max-w-md">
-                <TabsTrigger value="dashboard">대시보드</TabsTrigger>
-                <TabsTrigger value="customers">고객 관리</TabsTrigger>
-                <TabsTrigger value="settings">설정</TabsTrigger>
-              </TabsList>
+              <DashboardTabs />
 
               {/* 대시보드 탭 */}
               <TabsContent value="dashboard" className="space-y-6">
                 {/* KPI 카드 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium">
-                        전체 고객 수
-                      </CardTitle>
-                      <Users className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">
-                        {kpiData.totalCustomers}
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        +2 from last month
-                      </p>
-                    </CardContent>
-                  </Card>
+                <KPICards kpiData={kpiData} />
 
-                  <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium">
-                        유지율
-                      </CardTitle>
-                      <TrendingUp className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">
-                        {kpiData.retentionRate}%
-                      </div>
-                      <Progress
-                        value={kpiData.retentionRate}
-                        className="mt-2"
-                      />
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium">
-                        계약 만기 예정
-                      </CardTitle>
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">
-                        {kpiData.upcomingRenewals}
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        다음 30일 내
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium">
-                        알림 대기
-                      </CardTitle>
-                      <AlertCircle className="h-4 w-4 text-muted-foreground" />
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">
-                        {kpiData.pendingAlerts}
-                      </div>
-                      <p className="text-xs text-muted-foreground">처리 필요</p>
-                    </CardContent>
-                  </Card>
-                </div>
-
+                {/* 오늘 할 일 리스트 */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* 오늘 할 일 리스트 */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Clock className="h-5 w-5" />
-                        오늘 할 일
-                      </CardTitle>
-                      <CardDescription>
-                        우선 처리가 필요한 고객 관리 업무
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {todayTasks.map((task) => (
-                        <div
-                          key={task.id}
-                          className="flex items-center justify-between p-3 border rounded-lg"
-                        >
-                          <div className="flex items-center gap-3">
-                            {getTaskIcon(task.type)}
-                            <div>
-                              <p className="font-medium">{task.title}</p>
-                              <p className="text-sm text-muted-foreground">
-                                {task.description}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Badge variant={getPriorityColor(task.priority)}>
-                              {task.priority === "high"
-                                ? "높음"
-                                : task.priority === "medium"
-                                ? "보통"
-                                : "낮음"}
-                            </Badge>
-                            <Button size="sm" variant="outline">
-                              처리
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
+                  <TodoList />
 
                   {/* 실시간 알림 스트림 */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Bell className="h-5 w-5" />
-                        실시간 알림
-                      </CardTitle>
-                      <CardDescription>최근 발생한 알림 이벤트</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      {notifications.length === 0 ? (
-                        <p className="text-muted-foreground text-center py-4">
-                          새로운 알림이 없습니다.
-                        </p>
-                      ) : (
-                        notifications.map((notification) => (
-                          <div
-                            key={notification.id}
-                            className="flex items-center gap-3 p-2 border-l-2 border-blue-500 bg-blue-50 rounded"
-                          >
-                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                            <div className="flex-1">
-                              <p className="text-sm">{notification.message}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {notification.time}
-                              </p>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </CardContent>
-                  </Card>
+                  <NotificationList notifications={notifications ?? []} />
                 </div>
 
                 {/* 고객 통계 시각화 */}
